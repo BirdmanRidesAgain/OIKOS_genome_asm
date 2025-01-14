@@ -1,0 +1,83 @@
+---
+title: "Effects of input data on assembly contiguity"
+author: "Keiler Collier"
+date: "`r Sys.Date()`"
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source("utils.R")
+```
+
+# Introduction
+Conventional wisdom states that higher coverage genomes are higher quality. This produces a tradeoff, where one can expend additional sequencing effort^[This can encompass additional wet lab consumables, labor, bioinformatic effort, computing resources, or any combination of the above.] on one assembly instead of taking on other projects. Complicating the matter is the heterogeneity of long-read sequencing, where the longest subset of reads is expected to contribute disproportionately to 'scaffolding' pieces of the assembly together.
+
+Here, we explore the relationship between coverage (a proxy for sequencing effort) and contiguity, as well as read length and contiguity.
+
+## Preparation of our dataset
+**To remove a potential source of bias, all assemblies in this analysis were produced using exclusively ONT data**. All further analyses are performed on two datasets - one with all ONT-only assemblies ("all_ONT"), and a taxonomically-thinned subset of the above including only bony fish/*Actinopterygii* ("bonyfish").
+
+We have selected bony fish not only because they are overrepresented in our dataset (N=19), but because their genomes are attractive for analysis. Their are neither highly repetitive (as in [cartilaginous fish](https://www.cell.com/iscience/fulltext/S2589-0042(22)02088-0) or [mollusks](https://www.nature.com/articles/s41597-024-03014-8)), and generally have smaller genome sizes than mammals.
+
+```{r contiguity_dataset_prep}
+# Mutate dataframe to give us the percentage of longreads
+all_ONT <- asm_tib %>% filter(has_ont, !has_illumina, !has_pacbio)
+nall_ONT<-nrow(all_ONT)
+
+bonyfish<-all_ONT %>% filter(taxon=="Actinopterygii")
+nbonyfish<-nrow(bonyfish)
+
+knitr::kable(tibble(Dataset=c("all_ONT", "bonyfish"), N=c(nall_ONT, nbonyfish), Description=c("All OIKOS assemblies only using ONT data", "All bony fish only using ONT data.")))
+```
+
+# Coverage and contiguity
+
+## Influence of coverage on contiguity
+Contiguity (how completely your assembled contigs reflect an organism's actual karyotype) is often improved by increased data volume, generally measured in coverage. Here, we investigate the effect of increased coverage on two popular metrics of contiguity - [N50 and N90](https://en.wikipedia.org/wiki/N50,_L50,_and_related_statistics).
+
+However, because  our genomes encompass a taxonomically diverse set of organisms, we experience two problems. First, organisms have [variable](https://pmc.ncbi.nlm.nih.gov/articles/PMC3227167/) [genome](https://pubmed.ncbi.nlm.nih.gov/22042526/) [sizes](https://www.genomesize.com), preventing direct comparisons of N50 and N90. Secondly, animals have [different](https://www.jstage.jst.go.jp/article/ggs1921/53/4/53_4_251/_article/-char/ja/) [karyotypes](https://link.springer.com/article/10.1007/s00412-018-0685-6), potentially skewing results even when genome sizes are similar. A species, for example, with 80 equally-sized chromosomes will have a proportionally larger maximum N50 than a species with 40 variable-sized chromosomes.
+
+To account for the first problem, we express N-stats as a percentage of their respective organism's genome. We do not attempt to explicitly account for the second one, but we do note that its biasing effect is likely to be stronger in N50 than in N90 values.
+This is because N90 values, by definition, represent smaller, (usually) more-repetitive regions of the genome which assembly algorithms struggle with. 
+
+Thus, assembler performance in N90 contiguity is generally poorer and more variable across the board, which means that the assembly process is usually still the ultimate limiter of contiguity, rather than karyotype.
+
+## Contiguity and coverage plots
+```{r, all_ONT_coverage_plot, echo=FALSE, warning=FALSE, fig.cap="Stuff goes here.", fig.height=10, fig.width=10}
+cov_n50_plot <- plot_contiguity(in_data = all_ONT, dependent_metric = "coverage", contiguity_metric = "N50", fill = "project")
+cov_n90_plot <- plot_contiguity(in_data = all_ONT, dependent_metric = "coverage", contiguity_metric = "N90", fill = "project")
+
+compose_contiguity_plots(cov_n50_plot, cov_n90_plot, title = '', x_title = "Coverage")
+```
+
+```{r, bonyfish_coverage_plot, echo=FALSE, warning=FALSE, fig.cap="Stuff goes here.", fig.height=10, fig.width=10}
+cov_n50_plot <- plot_contiguity(in_data = bonyfish, dependent_metric = "coverage", contiguity_metric = "N50", fill = "project")
+cov_n90_plot <- plot_contiguity(in_data = bonyfish, dependent_metric = "coverage", contiguity_metric = "N90", fill = "project")
+
+compose_contiguity_plots(cov_n50_plot, cov_n90_plot, title = '', x_title = "Coverage")
+```
+
+# Very Long Reads (VLRs) and contiguity
+
+## Influence of VLRs on contiguity
+A tradeoff exists between the total volume of sequence data generated and the proportion of that dataset of extremely high length. **V**ery **L**ong **R**eads (VLR) are useful for scaffolding repetitive portions of the genome and disproportionately contribute to assembly contiguity. Here, we determine the cutoff for a VLR as: $$length >= 50,000bp$$.
+
+However, the yield of VLR relative to smaller reads is highly sensitive to both wet-lab processes and taxonomic effects. I do not currently have detailed information about the wet lab processes involved in producing these datasets, so these analyses are focused on the actual impact of increased numbers of longreads on assembly.
+
+BP counts are taken directly from raw data, before filtering with either [Kraken2](https://github.com/DerrickWood/kraken2) or trimming with [Chopper](https://github.com/wdecoster/chopper). Further information on where these processes fit into our workflow can be found at the [ONTeater](ONTeater_pipeline.html) information page.
+
+Knowing that these tools differentially remove short, low quality, and non-eukaryotic reads, the 'functional' ratio of VLRs-to-longreads will be systematically slightly higher in actual assembly than reported here. These differences are minimal, representing around 1-2% in most cases, as data loss in Kraken2 and Chopper tends to be low.
+
+## Contiguity and VLR plots
+```{r all_ONT_VLR_plot, echo=FALSE, warning=FALSE, fig.cap="Stuff goes here.", fig.height=10, fig.width=10}
+#plot<- plot_longread_contigity(asm_tib, "N50")
+plot1<- plot_contiguity(all_ONT, dependent_metric = "longrds", "N50", fill = "project")
+plot2<- plot_contiguity(all_ONT, dependent_metric = "longrds", "N90", fill = "project")
+compose_contiguity_plots(plot1 = plot1, plot2 = plot2, title = "Percent longreads and contiguity in KAUST assemblies", x_title = "Percent of reads greater than 50,000bp")
+```
+
+```{r bonyfish_VLR_plot, echo=FALSE, warning=FALSE, fig.cap="Stuff goes here.", fig.height=10, fig.width=10}
+#plot<- plot_longread_contigity(asm_tib, "N50")
+plot1<- plot_contiguity(bonyfish, dependent_metric = "longrds", "N50", fill = "project")
+plot2<- plot_contiguity(bonyfish, dependent_metric = "longrds", "N90", fill = "project")
+compose_contiguity_plots(plot1 = plot1, plot2 = plot2, title = "Percent longreads and contiguity in KAUST assemblies", x_title = "Percent of reads greater than 50,000bp")
+```

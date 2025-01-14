@@ -1,0 +1,26 @@
+---
+title: "Effects of input data on assembly completeness"
+author: "Keiler Collier"
+date: "`r Sys.Date()`"
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source("utils.R")
+```
+
+# Introduction
+Assembly completeness and contiguity (N50/N90) are not equivalent metrics. Coverage, which is associated with increased contiguity, also does not express assembly completeness, and is here treated as an additional proxy for completeness.
+
+It is difficult to fully estimate genome completenessm, and three major approaches exist:
+- kmer-based approaches (all portions of genome but highly sensitive to error rate)
+- BUSCO (assessment of single-copy othologs and proxy for completeness of coding regions)
+- UCEs (completeness of highly conserved noncoding regions)
+
+Of these three, we here address BUSCO, as it is the most commonly and easily reported, and addresses questions of completeness in functional (coding) regions. We check the correlation between it and the three contiguity metrics here in our largest subset of genomes, the KAUST fish.
+Here, we explore the relationship between coverage (a proxy for sequencing effort) and contiguity, as well as read length and contiguity.
+
+## Preparation of our dataset
+## Significance testing for BUSCO and contiguity metrics
+Here we do significance testing for BUSCO and various contiguity metrics. We also plot them.
+
+## Influence of coverage on comleteness (BUSCO)
