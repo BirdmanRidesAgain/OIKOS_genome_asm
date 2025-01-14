@@ -1,0 +1,9 @@
+---
+title: "About This Website"
+date: "`r Sys.Date()`"
+---
+# Introduction
+<img src="images/OIKOS_light.png" alt="OIKOS genomics logo" style="width:50%; height:50%; float:right">
+This is a website written and maintained by [Keiler Collier](https://github.com/BirdmanRidesAgain) to visualize [OIKOS](https://oikosgenomics.org/experience/)' genomics genome assemblies and store various reports. The assembly information used for this can be found [here](https://docs.google.com/spreadsheets/d/1759s3oPb-PCUOw9Pd0UJLUq22VEDr-C31ibzJB5WPV4/edit?gid=0#gid=0)^[This may be a private page. If you cannot access this, please contact keilercollier@icloud.com or BirdmanRidesAgain on GitHub to request access.].
+
+All assemblies on this website have been produced with the [ONTeater](https://github.com/BirdmanRidesAgain/ONTeater)^[This may also be private. As above, contact the author via GitHub or email.] assembly pipeline.

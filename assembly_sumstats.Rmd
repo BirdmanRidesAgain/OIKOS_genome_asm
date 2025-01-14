@@ -1,0 +1,28 @@
+---
+title: "OIKOS assembly summary stats"
+author: "Keiler Collier"
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source("utils.R")
+```
+
+# Summary statistics for assemblies
+
+All summary values are computed without missing (NA) values. Sheet 2, which details the flow cell and wet lab characteristics of individual sequencing runs, is not included here.
+
+Abbreviations:
+
+-   ADEA = [Abu Dhabi Environment Agency](https://www.ead.gov.ae/en)
+-   KAUST = [King Abdullah University of Science and Technology](https://www.kaust.edu.sa/en/)
+-   BUSCO = [Benchmarking Universal Single-Copy Orthologs](https://currentprotocols.onlinelibrary.wiley.com/doi/10.1002/cpz1.323)
+
+```{r, sumstats_tibble, warning=FALSE, message=FALSE}
+asm_tib_sumstats<-get_asm_sumstats(asm_tib)
+```
+
+```{r, sumstats_table, warning=FALSE, message=FALSE}
+create_dt(asm_tib_sumstats)
+```

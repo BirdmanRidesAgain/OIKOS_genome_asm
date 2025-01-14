@@ -1,0 +1,9 @@
+name: "OIKOS assemblies"
+output_dir: "docs"
+navbar:
+  title: "OIKOS assemblies"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "About"
+      href: about.html

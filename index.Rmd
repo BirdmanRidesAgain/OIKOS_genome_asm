@@ -1,0 +1,24 @@
+---
+title: "OIKOS genome assemblies" 
+date: "`r Sys.Date()`"
+---
+# Table of contents
+<img src="images/OIKOS_light.png" alt="OIKOS genomics logo" style="width:50%; height:50%; float:right">
+
+## [ONTeater pipeline](ONTeater_pipeline.html)
+- Flowchart of ONTeater operation
+- Usage documentation
+- Installation documentation
+
+## [Table of summary statistics (all assemblies)](assembly_sumstats.html)
+- Downloadable tables of contiguity, BUSCO and %-large-contig statistics
+
+## [Effects of input data on assembly contiguity](input_data_and_contiguity.html)
+- Plots of contiguity statistics against in ONT-only assemblies:
+  - Coverage
+  - % very long reads (VLR) in raw data
+  
+## [Effects of input data on assembly completeness](input_data_and_completeness.html)
+- Relationship between coverage
+  - BUSCO
+  - UCE content (future)

@@ -4,5 +4,4 @@
 .Ruserdata
 .DS_Store
 _site/
-docs/*cache
-docs/old_data
+old_data
